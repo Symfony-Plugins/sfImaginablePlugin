@@ -1,0 +1,11 @@
+propel:
+  _attributes:  { package: plugins.sfImaginablePlugin.lib.model }    
+    
+  sf_imaginable:
+    _attributes:  { phpName: sfImaginable }    
+    id:           { type: integer, required: true, primaryKey: true, autoIncrement: true }
+    position:     { type: integer, required: true }
+    object_class: { type: varchar(100), required: true, index: true }
+    object_id:    { type: integer, required: true, index: true }
+    file_name:    { type: varchar(255), required: true }
+    

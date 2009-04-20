@@ -1,0 +1,5 @@
+<?php 
+if(!$noObject) include_partial('sfImaginable/manageImagesSuccess',array('object'=>$object));
+else include_partial('sfImaginable/manageImagesError');
+?>
+
