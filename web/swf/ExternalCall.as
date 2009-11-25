@@ -21,9 +21,9 @@ package {
 			ExternalInterface.call(callback, EscapeMessage(file_object), EscapeMessage(error_code), EscapeMessage(message));
 			
 		}
-		public static function FileDialogComplete(callback:String, num_files_selected:Number, num_files_queued:Number):void {
+		public static function FileDialogComplete(callback:String, num_files_selected:Number, num_files_queued:Number, total_num_files_queued:Number):void {
 			
-			ExternalInterface.call(callback, EscapeMessage(num_files_selected), EscapeMessage(num_files_queued));
+			ExternalInterface.call(callback, EscapeMessage(num_files_selected), EscapeMessage(num_files_queued), EscapeMessage(total_num_files_queued));
 			
 		}
 		
@@ -36,9 +36,9 @@ package {
 			ExternalInterface.call(callback, EscapeMessage(file_object), EscapeMessage(bytes_loaded), EscapeMessage(bytes_total));
 			
 		}
-		public static function UploadSuccess(callback:String, file_object:Object, server_data:String):void {
+		public static function UploadSuccess(callback:String, file_object:Object, server_data:String, responseReceived:Boolean):void {
 			
-			ExternalInterface.call(callback, EscapeMessage(file_object), EscapeMessage(server_data));
+			ExternalInterface.call(callback, EscapeMessage(file_object), EscapeMessage(server_data), EscapeMessage(responseReceived));
 			
 		}
 		public static function UploadError(callback:String, error_code:Number, file_object:Object, message:String):void {
@@ -54,8 +54,12 @@ package {
 		public static function Debug(callback:String, message:String):void {
 			
 			ExternalInterface.call(callback, EscapeMessage(message));
-			
 		}
+		
+		public static function Bool(callback:String):Boolean {
+			return ExternalInterface.call(callback);
+		}
+		
 		
 		/* Escapes all the backslashes which are not translated correctly in the Flash -> JavaScript Interface
 		 * 
