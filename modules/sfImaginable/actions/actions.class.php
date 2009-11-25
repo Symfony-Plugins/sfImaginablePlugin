@@ -37,7 +37,7 @@ class sfImaginableActions extends sfActions
     }
                                  
     $object = imaginableTools::selectParentObjectByClassAndId( $object_class, $object_id );
-    $object -> addImage( $fileName );
+    $image_position = $object->addImage( $fileName );
     
     if (sfConfig::get('app_sf_imaginable_save_object_after_image_upload',false)) 
     {
@@ -46,13 +46,21 @@ class sfImaginableActions extends sfActions
  
     if (sfConfig::get('app_sf_imaginable_master_resize', false))
     {
+      $target_width   = sfConfig::get('app_sf_imaginable_master_width', 800);
+      $target_height  = sfConfig::get('app_sf_imaginable_master_height', 600);
+      
       $image = new sfImage($uploadDir . DIRECTORY_SEPARATOR . $fileName);
-      $image->setQuality(95);
-      $image->thumbnail(sfConfig::get('app_sf_imaginable_master_width', 800), sfConfig::get('app_sf_imaginable_master_height', 600));
-      $image->saveAs($uploadDir . DIRECTORY_SEPARATOR . $fileName, 'image/jpeg'); 
+      if ($image->getWidth() > $target_width || $image->getHeight() > $target_height)
+      {
+        $image->setQuality(95);
+        $image->thumbnail($target_width, $target_height);
+        $image->saveAs($uploadDir . DIRECTORY_SEPARATOR . $fileName, 'image/jpeg'); 
+      }
     }                                                                                      
  
-
+    $this->logMessage('TEST', 'alert');                                       
+ 
+ 
     $small_thumbnail = new sfImage($uploadDir . DIRECTORY_SEPARATOR . $fileName);
     if (sfConfig::get('app_sf_imaginable_thumbnail_crop', false)) {
       $small_thumbnail->thumbnail(sfConfig::get('app_sf_imaginable_thumbnail_small_width',84),  sfConfig::get('app_sf_imaginable_thumbnail_small_height',84), 'center');
@@ -78,6 +86,7 @@ class sfImaginableActions extends sfActions
     return sfView::NONE;
   }                 
   
+  
   public function executeList() 
   {                     
     sfConfig::set('sf_web_debug', false);
@@ -89,6 +98,7 @@ class sfImaginableActions extends sfActions
 
     $this->object = imaginableTools::selectParentObjectByClassAndId( $object_class, $object_id ); 
   }  
+  
   
   public function executeAjaxList() 
   {                     
@@ -105,6 +115,7 @@ class sfImaginableActions extends sfActions
     }
   }
   
+  
   public function executeReorder()
   {
     $order = $this->getRequestParameter('sortable_list');
@@ -116,7 +127,8 @@ class sfImaginableActions extends sfActions
     
     return sfView::NONE;
   }
-
+                             
+                             
   public function executeRemoveImage()
   {
     sfConfig::set('sf_web_debug', false);      
@@ -126,4 +138,17 @@ class sfImaginableActions extends sfActions
     
     return sfView::NONE;
   }
+  
+  
+  public function executeAjaxUpdateCaption(sfWebRequest $request)
+  {
+    if ('POST' == $request->getMethod() && true == $request->isXmlHttpRequest())
+    {
+      $image = sfImaginablePeer::retrieveByPK($request->getParameter('id'));
+      $image->setCaption($request->getParameter('caption'));
+      $image->save();
+      return $this->renderText($image->getCaption());
+    }
+  }
+  
 }

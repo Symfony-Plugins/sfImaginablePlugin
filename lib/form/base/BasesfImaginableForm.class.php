@@ -6,7 +6,7 @@
  * @package    ##PROJECT_NAME##
  * @subpackage form
  * @author     ##AUTHOR_NAME##
- * @version    SVN: $Id: sfPropelFormGeneratedTemplate.php 15484 2009-02-13 13:13:51Z fabien $
+ * @version    SVN: $Id: sfPropelFormGeneratedTemplate.php 16976 2009-04-04 12:47:44Z fabien $
  */
 class BasesfImaginableForm extends BaseFormPropel
 {
@@ -18,6 +18,7 @@ class BasesfImaginableForm extends BaseFormPropel
       'object_class' => new sfWidgetFormInput(),
       'object_id'    => new sfWidgetFormInput(),
       'file_name'    => new sfWidgetFormInput(),
+      'caption'      => new sfWidgetFormTextarea(),
     ));
 
     $this->setValidators(array(
@@ -26,6 +27,7 @@ class BasesfImaginableForm extends BaseFormPropel
       'object_class' => new sfValidatorString(array('max_length' => 100)),
       'object_id'    => new sfValidatorInteger(),
       'file_name'    => new sfValidatorString(array('max_length' => 255)),
+      'caption'      => new sfValidatorString(array('required' => false)),
     ));
 
     $this->widgetSchema->setNameFormat('sf_imaginable[%s]');

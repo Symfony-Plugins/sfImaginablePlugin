@@ -8,7 +8,7 @@ require_once(sfConfig::get('sf_lib_dir').'/filter/base/BaseFormFilterPropel.clas
  * @package    ##PROJECT_NAME##
  * @subpackage filter
  * @author     ##AUTHOR_NAME##
- * @version    SVN: $Id: sfPropelFormFilterGeneratedTemplate.php 15484 2009-02-13 13:13:51Z fabien $
+ * @version    SVN: $Id: sfPropelFormFilterGeneratedTemplate.php 16976 2009-04-04 12:47:44Z fabien $
  */
 class BasesfImaginableFormFilter extends BaseFormFilterPropel
 {
@@ -19,6 +19,7 @@ class BasesfImaginableFormFilter extends BaseFormFilterPropel
       'object_class' => new sfWidgetFormFilterInput(),
       'object_id'    => new sfWidgetFormFilterInput(),
       'file_name'    => new sfWidgetFormFilterInput(),
+      'caption'      => new sfWidgetFormFilterInput(),
     ));
 
     $this->setValidators(array(
@@ -26,6 +27,7 @@ class BasesfImaginableFormFilter extends BaseFormFilterPropel
       'object_class' => new sfValidatorPass(array('required' => false)),
       'object_id'    => new sfValidatorSchemaFilter('text', new sfValidatorInteger(array('required' => false))),
       'file_name'    => new sfValidatorPass(array('required' => false)),
+      'caption'      => new sfValidatorPass(array('required' => false)),
     ));
 
     $this->widgetSchema->setNameFormat('sf_imaginable_filters[%s]');
@@ -48,6 +50,7 @@ class BasesfImaginableFormFilter extends BaseFormFilterPropel
       'object_class' => 'Text',
       'object_id'    => 'Number',
       'file_name'    => 'Text',
+      'caption'      => 'Text',
     );
   }
 }

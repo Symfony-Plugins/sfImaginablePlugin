@@ -3,8 +3,9 @@ class imaginableTools
 {
   public static function selectParentObjectByClassAndId( $object_class, $object_id )
   {
-    $objectPeerClass = $object_class.'Peer';             
+    $objectPeerClass = constant($object_class.'::PEER'); // $object_class.'Peer';             
     $object = call_user_func(array($objectPeerClass, 'retrieveByPk'), $object_id);
+
     return $object;
   }
   
@@ -39,7 +40,7 @@ class imaginableTools
      $text = strtolower($text);
 
      // strip all non word chars, except for .jpg / .gif / . png
-     $text = preg_replace('/\W?=\.(jpg|gif|png)/', ' ', $text);
+     $text = preg_replace('/\W?=\.(jpg|jpeg|gif|png)/', ' ', $text);
 
      // replace all white space sections with an underscore
      $text = preg_replace('/\ +/', '_', $text);
@@ -53,8 +54,6 @@ class imaginableTools
   
   public static function autoCropImage(sfImage $image, $width, $height)
   {
-    //$image->setAdapter( new sfImageTransformImageMagickAdapter());
-    
     $org_width  = $image->getWidth();
     $org_height = $image->getHeight();
     $org_prop = round($org_width/$org_height, 2);
@@ -75,6 +74,7 @@ class imaginableTools
       $image->resize($new_width = (int)round(($org_width / $org_height)*$height), $height);
       $image->crop((int)round(($new_width-$width) / 2), 0, $width,$height);     
     }
+    
     return $image;
   }
   

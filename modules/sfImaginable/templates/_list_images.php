@@ -2,11 +2,7 @@
   <span class="legend"><?php echo __('Images',null,'sfImaginable')?></span>
   
 <?php use_helper('Javascript','I18N','sfImaginable');
-  $response = sfContext::getInstance()->getResponse();
-  $response->addJavascript(sfConfig::get('sf_prototype_web_dir').'/js/prototype');
-  $response->addJavascript(sfConfig::get('sf_prototype_web_dir').'/js/builder');
-  $response->addJavascript(sfConfig::get('sf_prototype_web_dir').'/js/effects');
-  $response->addJavascript(sfConfig::get('sf_prototype_web_dir').'/js/dragdrop');
+  
   $images = $object->getImages();
   if ($images): //Start if section for when there are images attatched to the object
 ?>
@@ -14,19 +10,16 @@
   <div id="sortable_list">    
   <?php foreach ($images as $image): ?>
 
-    <div class="sfImaginable_list_record" id="item_<?=$image->getId()?>" style="width: 100%; clear: both;"> 
+    <div class="sfImaginable_list_record" id="item_<?php echo $image->getId()?>" > 
       <?php echo imaginable_tag($image, array('thumbnail'=>'small','style'=>'float: left;')); ?>
-      <p style="margin-left: 90px; margin-bottom: 10px">
-        <a href="<?='/uploads/'.$image?>"> <?=__('Full Size',null,'sfImaginable')?> </a> <br />
-        <?=__('Image ID',null,'sfImaginable')?>: <?=$image->getId()?><br />                                             
-        <?=__('Image position',null,'sfImaginable')?>: <?=$image->getPosition()?><br />
-        <?=__('Image filename',null,'sfImaginable')?>: <?=$image?><br />   
-        <?php echo link_to_remote(__('DELETE',null,'sfImaginable'),array(
-              'url'=>'sfImaginable/removeImage?id='.$image->getId(),
-              'loading'=>visual_effect('BlindUp','item_'.$image->getId(),array('duration'=>'0.3')),
-              'complete'=>'ajaxUpdateImageList()',
-              'confirm'=>__('Are you sure you want to delete this file?',null,'sfImaginable'),
-        )); ?>                                         
+      <p>
+        <a target="blank" href="<?php echo '/uploads/'.$image?>"> <?php echo __('Full Size',null,'sfImaginable')?> </a> <br />
+        <?php echo __('Image ID',null,'sfImaginable')?>: <?php echo $image->getId()?><br />                                             
+        <?php echo __('Image position',null,'sfImaginable')?>: <?php echo $image->getPosition()?><br />
+        <?php echo __('Image filename',null,'sfImaginable')?>: <?php echo $image?><br />   
+        <?php echo _admin_imaginable_link_to_remove($image); ?><br />   
+        <?php echo __('Caption'); ?>: <span class="sfImaginable_item_caption"><?php echo $image->getCaption(); ?></span> <input type="button" value="Change" />
+        
       </p>
     </div>   
 
@@ -34,17 +27,65 @@
   </div>
 
   <div class="clearer">&nbsp;</div>
-
-  <?php echo sortable_element('sortable_list', array(
-    'url'=>'sfImaginable/reorder',
-    'tag'=>'div',
-    'with'=>"Sortable.serialize('sortable_list') + '&object_class=".get_class($object)."&object_id=".$object->getId()."'",
-    //'loading'=>'Element.show("indicator")',
-    //'complete'=>visual_effect('BlindUp','indicator')
-    'complete'=>'ajaxUpdateImageList()',
-  )); ?>
-
-  <div id="indicator" style="display:none; margin: auto; vertical-align:middle;">
+  
+  <script type="text/javascript">
+  //<![CDATA[
+    jQuery(document).ready(function() {
+      jQuery('#sortable_list').sortable({
+          axis: 'y',
+          placeholder: 'sfImaginable_list_record-highlight',
+          update: function(event, ui)
+            {
+              var serialized = jQuery('#sortable_list').sortable('serialize', {key: 'sortable_list[]'});
+              jQuery.ajax({
+                url: "<?php echo url_for('sfImaginable/reorder')?>",
+                type: "POST",
+                success: function(){ajaxUpdateImageList();},
+                data: serialized + '&object_id=<?php echo $object->getId(); ?>&object_class=<?php echo get_class($object); ?>'
+              });
+            }
+      });
+      
+      jQuery('.sfImaginable_list_record input[value=Change]').live('click' ,function(event) {
+          event.preventDefault();
+          jQuery(this).parent().children('span').each(function() { 
+            jQuery(this).replaceWith('<input type="text" value="' + jQuery(this).text() + '" />');
+          });                                                        
+          jQuery(this).after('<input type="button" value="Update" />').remove();
+      });
+    
+      jQuery('.sfImaginable_list_record input[value=Update]').live('click', function(event) {
+        event.preventDefault();
+        thisObject = jQuery(this);  
+        thisObject.attr('value', 'Sending...');
+        jQuery.ajax({
+          url: "<?php echo url_for('sfImaginable/ajaxUpdateCaption'); ?>",
+          type: "POST",
+          data: {
+            id:       jQuery(this).parents('.sfImaginable_list_record').attr('id').substring(5),
+            caption:  jQuery(this).parent().children('input[type=text]').val() 
+          },
+          success: function(data) {
+            thisObject.parent().children('input[type=text]').replaceWith('<span class="sfImaginable_item_caption">' + data + '</span>');
+            thisObject.after('<input type="button" value="Change" />').remove(); 
+          }
+        });
+      });
+      
+      jQuery('.sfImaginable_list_record input[type=text]').live('keypress', function(event) {
+        if(event.which == 13) // enter key 
+        { 
+          event.preventDefault();
+          jQuery(this).parent().children('input[value=Update]').trigger('click');
+        }
+      });
+    
+    });
+  //]]>
+  </script>
+  
+                    
+  <div id="indicator">
     <?php echo image_tag('/sfImaginablePlugin/images/ajax-loader.gif',array('alt'=>'Loading!','width'=>'22','height'=>'22'))?>
   </div>
 

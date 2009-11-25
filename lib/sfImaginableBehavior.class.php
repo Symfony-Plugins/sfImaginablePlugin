@@ -39,7 +39,7 @@ class sfImaginableBehavior
     $image->setFileName( $filename );
     $image->setPosition( $this->getMaxPosition($object) + 1 );
     $image->save();    
-    return true;
+    return $image->getPosition();
   }
   
   
@@ -158,7 +158,7 @@ class sfImaginableBehavior
   {                                                       
     if (!is_array($order))
     {
-      $msg = sprintf('reorderImages() requires an array of positions and ids to work. Vriable given was of type : %s.', get_class($order));
+      $msg = sprintf('reorderImages() requires an array of positions and ids to work. Variable given was of type : %s.', var_dump($order));
       throw new Exception($msg);
       return false;
     }   
